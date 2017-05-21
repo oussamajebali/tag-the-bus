@@ -1,61 +1,34 @@
 package com.aquafadas.tagthebus.station.model;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
+
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by Oussama on 20/05/2017.
  */
 
-public class Station implements Serializable {
+public class Station extends RealmObject implements Serializable {
 
-    @SerializedName("id")
-    @Expose
+    @PrimaryKey
     private int id;
-
-    @SerializedName("street_name")
-    @Expose
     private String street_name;
-
-    @SerializedName("city")
-    @Expose
     private String city;
-
-    @SerializedName("utm_x")
-    @Expose
     private String utm_x;
-
-    @SerializedName("utm_y")
-    @Expose
     private String utm_y;
-
-    @SerializedName("lat")
-    @Expose
     private double lat;
-
-    @SerializedName("lon")
-    @Expose
     private double lon;
-
-    @SerializedName("furniture")
-    @Expose
     private String furniture;
-
-    @SerializedName("buses")
-    @Expose
     private String buses;
-
-    @SerializedName("distance")
-    @Expose
     private String distance;
-
+    private RealmList<Picture> pictures;
 
     public Station() {
     }
 
-    public Station(int id, String street_name, String city, String utm_x, String utm_y, double lat, double lon, String furniture, String buses, String distance) {
+    public Station(int id, String street_name, String city, String utm_x, String utm_y, double lat, double lon, String furniture, String buses, String distance, RealmList<Picture> pictures) {
         this.id = id;
         this.street_name = street_name;
         this.city = city;
@@ -66,6 +39,7 @@ public class Station implements Serializable {
         this.furniture = furniture;
         this.buses = buses;
         this.distance = distance;
+        this.pictures = pictures;
     }
 
     public int getId() {
@@ -148,19 +122,11 @@ public class Station implements Serializable {
         this.distance = distance;
     }
 
-    @Override
-    public String toString() {
-        return "Station{" +
-                "id='" + id + '\'' +
-                ", street_name='" + street_name + '\'' +
-                ", city='" + city + '\'' +
-                ", utm_x='" + utm_x + '\'' +
-                ", utm_y='" + utm_y + '\'' +
-                ", lat='" + lat + '\'' +
-                ", lon='" + lon + '\'' +
-                ", furniture='" + furniture + '\'' +
-                ", buses='" + buses + '\'' +
-                ", distance='" + distance + '\'' +
-                '}';
+    public RealmList<Picture> getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(RealmList<Picture> pictures) {
+        this.pictures = pictures;
     }
 }

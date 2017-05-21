@@ -7,6 +7,8 @@ import android.support.multidex.MultiDexApplication;
 import com.aquafadas.tagthebus.utils.ConnectivityReceiver;
 import com.aquafadas.tagthebus.utils.ConnectivityReceiver.ConnectivityReceiverListener;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -29,6 +31,7 @@ public class TagTheBusApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         mInstance = this;
         context = this.getApplicationContext();

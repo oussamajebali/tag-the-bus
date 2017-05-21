@@ -20,10 +20,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.aquafadas.tagthebus.R;
 import com.aquafadas.tagthebus.station.adapter.StationAdapter;
+import com.aquafadas.tagthebus.station.manager.SharedManager;
 import com.aquafadas.tagthebus.station.model.Station;
 import com.aquafadas.tagthebus.station.presenter.StationPresenter;
 import com.aquafadas.tagthebus.station.view.StationView.RemoteView;
@@ -82,6 +85,9 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
     @BindView(R.id.map_layout)
     RelativeLayout mapLayout;
 
+    @BindView(R.id.refresh_station)
+    ImageView refreshStation;
+
 
     private OnStationFragmentInteractionListener mListener;
     private StationAction stationAction;
@@ -96,6 +102,7 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
     protected LocationSettingsRequest mLocationSettingsRequest;
+    private ArrayList<Station> stations = new ArrayList<>();
 
     public StationFragment() {
         // Required empty public constructor
@@ -104,7 +111,7 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stationAction = new StationPresenter(this);
+        stationAction = new StationPresenter(this, this);
 
     }
 
@@ -253,6 +260,12 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
         listButton.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 
+    @OnClick(R.id.refresh_station)
+    public void refreshStationList() {
+        SharedManager.with(getActivity()).setPreLoad(false);
+        stationAction.getStationsList();
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -292,7 +305,7 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
                     @Override
                     public void onItemClick(View view, int position) {
                         Bundle bundle = new Bundle();
-                        bundle.putSerializable(STATION, stations.get(position));
+                        bundle.putInt(STATION, stations.get(position).getId());
                         if (mListener != null)
                             mListener.openDetailFragment(bundle);
                     }
@@ -300,39 +313,40 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
     }
 
     private void goToDetailFromMap(final ArrayList<Station> stations) {
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
+        if (googleMap != null) {
+            googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
 
-                for (Station station : stations) {
-                    if (String.valueOf(station.getStreet_name()).equals(marker.getTitle())) {
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(STATION, station);
-                        if (mListener != null)
-                            mListener.openDetailFragment(bundle);
+                    for (Station station : stations) {
+                        if (String.valueOf(station.getStreet_name()).equals(marker.getTitle())) {
+                            Bundle bundle = new Bundle();
+                            bundle.putInt(STATION, station.getId());
+                            if (mListener != null)
+                                mListener.openDetailFragment(bundle);
+                        }
                     }
+
+
                 }
-
-
-            }
-        });
+            });
+        }
     }
 
     @Override
     public void getStationSuccess(ArrayList<Station> stations) {
-        for (int i = 0; i < stations.size(); i++) {
-            Log.e("StationFragment", stations.get(i).toString());
-        }
-        initStationRecycler(stations);
-        if (googleMap != null)
-            populateMap(stations);
+        if (!stations.isEmpty()) {
+            this.stations = stations;
+            initStationRecycler(stations);
+            goToDetailFromList(stations);
+        } else
+            Toast.makeText(getActivity(), "Temporary server error. Please try again later", Toast.LENGTH_LONG).show();
 
-        goToDetailFromList(stations);
-        goToDetailFromMap(stations);
     }
 
     @Override
     public void getStationError() {
+        Toast.makeText(getActivity(), "Temporary server error. Please try again later", Toast.LENGTH_LONG).show();
 
     }
 
@@ -394,7 +408,6 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
                         checkLocationSettings();
                         break;
                     case Activity.RESULT_CANCELED:
-                        //finish();
                         break;
                 }
                 break;
@@ -426,6 +439,11 @@ public class StationFragment extends Fragment implements RemoteView, GoogleMap.O
         googleMap.setIndoorEnabled(true);
         googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
+        if (!stations.isEmpty()) {
+            populateMap(stations);
+            goToDetailFromMap(stations);
+        }
+
     }
 
 

@@ -11,6 +11,8 @@ public class AppStaticValues {
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
     public static final String STATION = "station";
+    public static final String PATH = "path";
+    public static final String PICTURE = "picture";
 
     public static final String NEARSTATIONS = "nearstations";
     public static final String ID= "id";
@@ -23,4 +25,10 @@ public class AppStaticValues {
     public static final String FURNITURE= "furniture";
     public static final String BUSES = "buses";
     public static final String DISTANCE = "distance";
+
+    public static final String PRE_LOAD = "preLoad";
+    public static final String PREFS_NAME = "prefs";
+
+    public static final int CAMERA_PICTURE = 1;
+    public static final int GALLERY_PICTURE = 2;
 }

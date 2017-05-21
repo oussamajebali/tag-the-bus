@@ -9,6 +9,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.aquafadas.tagthebus.station.fragment.PictureFragment;
+import com.aquafadas.tagthebus.station.fragment.PictureFragment.OnPictureFragmentInteractionListener;
+import com.aquafadas.tagthebus.station.fragment.ShareFragment;
+import com.aquafadas.tagthebus.station.fragment.ShareFragment.OnShareFragmentInteractionListener;
 import com.aquafadas.tagthebus.station.fragment.StationDetailFragment;
 import com.aquafadas.tagthebus.station.fragment.StationDetailFragment.OnStationDetailFragmentInteractionListener;
 import com.aquafadas.tagthebus.station.fragment.StationFragment;
@@ -16,7 +20,12 @@ import com.aquafadas.tagthebus.station.fragment.StationFragment.OnStationFragmen
 import com.aquafadas.tagthebus.utils.ConnectivityReceiver;
 import com.aquafadas.tagthebus.utils.ConnectivityReceiver.ConnectivityReceiverListener;
 
-public class MainActivity extends AppCompatActivity implements OnStationFragmentInteractionListener, OnStationDetailFragmentInteractionListener, ConnectivityReceiverListener {
+public class MainActivity extends AppCompatActivity implements
+        OnStationFragmentInteractionListener,
+        OnStationDetailFragmentInteractionListener,
+        OnPictureFragmentInteractionListener,
+        OnShareFragmentInteractionListener,
+        ConnectivityReceiverListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements OnStationFragment
         }
 
     }
-
 
     public void replaceFragment(Fragment fragment, int frameLayout, boolean withBackStack) {
         android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -68,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnStationFragment
                 Toast.makeText(MainActivity.this, "Permission Granted, Now you can access location data.", Toast.LENGTH_LONG).show();
 
             } else {
-                Toast.makeText(MainActivity.this, "Permission Denied, You cannot access location data.", Toast.LENGTH_LONG).show();
+                requestLocationPermission();
             }
 
         }
@@ -104,5 +112,19 @@ public class MainActivity extends AppCompatActivity implements OnStationFragment
         fragment.setArguments(bundle);
         addFragment(fragment, R.id.frame_home, true);
 
+    }
+
+    @Override
+    public void openPictureFragment(Bundle bundle) {
+        PictureFragment fragment = new PictureFragment();
+        fragment.setArguments(bundle);
+        replaceFragment(fragment, R.id.frame_home, true);
+    }
+
+    @Override
+    public void openShareFragment(Bundle bundle) {
+        ShareFragment fragment = new ShareFragment();
+        fragment.setArguments(bundle);
+        addFragment(fragment, R.id.frame_home, true);
     }
 }
